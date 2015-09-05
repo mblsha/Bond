@@ -71,11 +71,11 @@ class TestTableView: NSTableView {
 }
 
 class TestTableViewDelegate: BNDTableViewDelegate {
-  @objc func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
+  func createCell(row: Int, array: ObservableArray<Int>, tableView: NSTableView) -> NSTableCellView {
     fatalError("should be unused in tests, as we never show the NSTableView")
   }
 
-  func createCell(row: Int, array: ObservableArray<Int>, tableView: NSTableView) -> NSTableCellView {
+  func doubleAction(item: Int?, tableView: NSTableView) {
     fatalError("should be unused in tests, as we never show the NSTableView")
   }
 }

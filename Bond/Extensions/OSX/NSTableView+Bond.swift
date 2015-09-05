@@ -27,6 +27,7 @@ import Cocoa
 public protocol BNDTableViewDelegate {
   typealias Element
   func createCell(row: Int, array: ObservableArray<Element>, tableView: NSTableView) -> NSTableCellView
+  func doubleAction(item: Element?, tableView: NSTableView)
 }
 
 class BNDTableViewDataSource<DelegateType: BNDTableViewDelegate>: NSObject, NSTableViewDataSource, NSTableViewDelegate {
@@ -44,9 +45,12 @@ class BNDTableViewDataSource<DelegateType: BNDTableViewDelegate>: NSObject, NSTa
     tableView.setDelegate(self)
     tableView.reloadData()
 
+    tableView.target = self
+    tableView.doubleAction = Selector("doubleAction:")
+
     array.observeNew { [weak self] arrayEvent in
       guard let unwrappedSelf = self,
-                tableView = unwrappedSelf.tableView else { return }
+        tableView = unwrappedSelf.tableView else { return }
 
       switch arrayEvent.operation {
       case .Batch(let operations):
@@ -62,7 +66,7 @@ class BNDTableViewDataSource<DelegateType: BNDTableViewDelegate>: NSObject, NSTa
         BNDTableViewDataSource.applyRowUnitChangeSet(arrayEvent.operation.changeSet(), tableView: tableView)
         tableView.endUpdates()
       }
-    }.disposeIn(bnd_bag)
+      }.disposeIn(bnd_bag)
   }
 
   private class func applyRowUnitChangeSet(changeSet: ObservableArrayEventChangeSet, tableView: NSTableView) {
@@ -74,6 +78,17 @@ class BNDTableViewDataSource<DelegateType: BNDTableViewDelegate>: NSObject, NSTa
       tableView.reloadDataForRowIndexes(NSIndexSet(set: indices), columnIndexes: NSIndexSet())
     case .Deletes(let indices):
       tableView.removeRowsAtIndexes(NSIndexSet(set: indices), withAnimation: .EffectNone)
+    }
+  }
+
+  /// MARK - doubleAction
+
+  @objc internal func doubleAction(sender: AnyObject) {
+    let row = tableView.selectedRow
+    if row >= 0 {
+      delegate?.doubleAction(array[row], tableView: tableView)
+    } else {
+      delegate?.doubleAction(nil, tableView: tableView)
     }
   }
 
@@ -91,8 +106,8 @@ class BNDTableViewDataSource<DelegateType: BNDTableViewDelegate>: NSObject, NSTa
 
   override func forwardingTargetForSelector(aSelector: Selector) -> AnyObject? {
     guard let delegate = delegate as? AnyObject
-    where delegate.respondsToSelector(aSelector) else {
-      return self
+      where delegate.respondsToSelector(aSelector) else {
+        return self
     }
 
     return delegate
@@ -100,8 +115,8 @@ class BNDTableViewDataSource<DelegateType: BNDTableViewDelegate>: NSObject, NSTa
 
   override func respondsToSelector(aSelector: Selector) -> Bool {
     guard let delegate = delegate as? AnyObject
-    where delegate.respondsToSelector(aSelector) else {
-      return super.respondsToSelector(aSelector)
+      where delegate.respondsToSelector(aSelector) else {
+        return super.respondsToSelector(aSelector)
     }
 
     return true

@@ -28,6 +28,7 @@ public protocol BNDTableViewDelegate {
   typealias Element
   func createCell(row: Int, array: ObservableArray<Element>, tableView: NSTableView) -> NSTableCellView
   func doubleAction(item: Element?, tableView: NSTableView)
+  func tableViewSelectionDidChange(item: Element?, tableView: NSTableView)
 }
 
 class BNDTableViewDataSource<DelegateType: BNDTableViewDelegate>: NSObject, NSTableViewDataSource, NSTableViewDelegate {
@@ -102,6 +103,15 @@ class BNDTableViewDataSource<DelegateType: BNDTableViewDelegate>: NSObject, NSTa
 
   @objc func tableView(tableView: NSTableView, viewForTableColumn tableColumn: NSTableColumn?, row: Int) -> NSView? {
     return delegate?.createCell(row, array: array, tableView: tableView)
+  }
+
+  @objc internal func tableViewSelectionDidChange(aNotification: NSNotification) {
+    let row = tableView.selectedRow
+    if row >= 0 {
+      delegate?.tableViewSelectionDidChange(array[row], tableView: tableView)
+    } else {
+      delegate?.tableViewSelectionDidChange(nil, tableView: tableView)
+    }
   }
 
   override func forwardingTargetForSelector(aSelector: Selector) -> AnyObject? {

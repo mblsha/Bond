@@ -78,6 +78,10 @@ class TestTableViewDelegate: BNDTableViewDelegate {
   func doubleAction(item: Int?, tableView: NSTableView) {
     fatalError("should be unused in tests, as we never show the NSTableView")
   }
+
+  func tableViewSelectionDidChange(item: Int?, tableView: NSTableView) {
+    fatalError("should be unused in tests, as we never show the NSTableView")
+  }
 }
 
 class NSTableViewDataSourceTests: XCTestCase {

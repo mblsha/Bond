@@ -37,6 +37,7 @@ class BNDTableViewDataSource<DelegateType: BNDTableViewDelegate>: NSObject, NSTa
   private var delegate: DelegateType?
 
   private init(array: ObservableArray<DelegateType.Element>, tableView: NSTableView, delegate: DelegateType) {
+    print("\(self.dynamicType)")
     self.tableView = tableView
     self.delegate = delegate
     self.array = array
@@ -68,6 +69,10 @@ class BNDTableViewDataSource<DelegateType: BNDTableViewDelegate>: NSObject, NSTa
         tableView.endUpdates()
       }
       }.disposeIn(bnd_bag)
+  }
+
+  deinit {
+    print("~\(self.dynamicType)")
   }
 
   private class func applyRowUnitChangeSet(changeSet: ObservableArrayEventChangeSet, tableView: NSTableView) {

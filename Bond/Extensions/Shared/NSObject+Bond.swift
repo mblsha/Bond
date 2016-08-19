@@ -139,8 +139,8 @@ public extension Observable where Wrapped: OptionalType {
   }
 }
 
-internal extension NSObject {
   
+public extension NSObject {
   internal var bnd_associatedObservables: [String:AnyObject] {
     get {
       return objc_getAssociatedObject(self, &AssociatedKeys.AssociatedObservablesKey) as? [String:AnyObject] ?? [:]
@@ -150,7 +150,7 @@ internal extension NSObject {
     }
   }
   
-  internal func bnd_associatedObservableForValueForKey<T>(key: String, initial: T? = nil, set: (T -> ())? = nil) -> Observable<T> {
+  public func bnd_associatedObservableForValueForKey<T>(key: String, initial: T? = nil, set: (T -> ())? = nil) -> Observable<T> {
     if let observable: AnyObject = bnd_associatedObservables[key] {
       return observable as! Observable<T>
     } else {
@@ -174,7 +174,7 @@ internal extension NSObject {
     }
   }
   
-  internal func bnd_associatedObservableForValueForKey<T: OptionalType>(key: String, initial: T? = nil, set: (T -> ())? = nil) -> Observable<T> {
+  public func bnd_associatedObservableForValueForKey<T: OptionalType>(key: String, initial: T? = nil, set: (T -> ())? = nil) -> Observable<T> {
     if let observable: AnyObject = bnd_associatedObservables[key] {
       return observable as! Observable<T>
     } else {
